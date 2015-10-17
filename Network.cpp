@@ -1,3 +1,4 @@
+#pragma once
 #include "stdafx.h"
 #include "Neuron.cpp"
 #include <vector>
@@ -9,13 +10,14 @@
 #define BUTTONS 13
 #define MAXNODES 1000000
 
+
 class Genome
 {
 public:
 	std::vector<Gene> GeneList;
 	int fitness;
 	int adjustedFitness;
-	Network GenomeNetwork;
+	//Network GenomeNetwork; replaced with std::vector<Neuron> NeuronList{ MAXNODES + BUTTONS };
 	int maxNeuron;
 	double mutationRates[7];
 	double MutateConnectionsChance = 0.25;
@@ -25,13 +27,14 @@ public:
 	double NodeMutationChance = 0.50;
 	double BiasMutationChance = 0.40;
 	double StepSize = 0.1;
+	std::vector<Neuron> NeuronList{ MAXNODES + BUTTONS };
 
 	Genome()
 	{
 		std::vector<Gene> GeneList{};
 		fitness = 0;
 		adjustedFitness = 0;
-		GenomeNetwork;
+		NeuronList;
 		double MutateConnectionsChance = 0.25;
 		double PerturbChance = 0.90;
 		double CrossoverChance = 0.75;
@@ -43,7 +46,8 @@ public:
 		double EnableMutationChance = 0.2;
 
 		maxNeuron = 0;
-		double mutationRates[7] = {
+		double mutationRates[7] = 
+		{
 			MutateConnectionsChance,//connections
 			LinkMutationChance,     //link
 			BiasMutationChance,		//bias
@@ -59,7 +63,7 @@ public:
 	{
 		//Below might be useful for making a copy method instead (see the Gene class line 194-200)
 		//Genome copyOfGenome = new Genome();
-		for (int x = 1; x < GenomeToCopy.GeneList.capacity; x++)
+		for (int x = 1; x < GenomeToCopy.GeneList.capacity(); x++)
 		{
 			//need "table" to store Gene values here. See line 245-247 http://pastebin.com/ZZmSNaHX
 		}
@@ -72,25 +76,17 @@ public:
 		std::copy(std::begin(GenomeToCopy.mutationRates), std::end(GenomeToCopy.mutationRates), std::begin(mutationRates));
 	}
 
-	Genome(string basic) //equivalent of basicGenome line 263
+	Genome generateBasicGenome() //equivalent of basicGenome line 263
 	{
 		Genome jeanGnome = Genome();
 		int innovation = 1;
 		maxNeuron = Inputs;
 		mutate(jeanGnome);    //need to write method!
+		return jeanGnome;
 	}
-};
 
-
-class Network
-{
-public:
-	std::vector<Neuron> NeuronList{ MAXNODES + BUTTONS };
-	//not sure how he uses the Neurons object in LUA need to investigate.
-
-	Network() {}
-
-	Network(Genome GenomeForNetwork)
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Experimental ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	void generateNetwork(Genome baseGenome)
 	{
 		std::vector<Neuron> temp;
 		temp.assign((BOXRADIUS * 2 + 1)*(BOXRADIUS * 2 + 1), Neuron());
@@ -112,16 +108,18 @@ public:
 		Figured out below:
 		http://stackoverflow.com/questions/1723066/c-stl-custom-sorting-one-vector-based-on-contents-of-another
 		*/
+
 		struct by_out {
 			bool operator()(Gene a, Gene b) {
 				return a.out < b.out;
 			}
 		};
+
 		std::sort(NeuronList.begin(), NeuronList.end(), by_out());
 
-		for (int i = 0; i < GenomeForNetwork.GeneList.size(); i++)
+		for (int i = 0; i < baseGenome.GeneList.size(); i++)
 		{
-			Gene currGene = GenomeForNetwork.GeneList[i];
+			Gene currGene = baseGenome.GeneList[i];
 			if (currGene.enabled)
 			{
 				/*
@@ -135,6 +133,7 @@ public:
 				tempNeuron.incoming.push_back(currGene);
 			}
 		}
-		GenomeForNetwork.GenomeNetwork = *this;
+		//NEEDS CHANGE: baseGenome.GenomeNetwork = *this;
 	}
 };
+
