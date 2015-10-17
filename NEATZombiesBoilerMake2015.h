@@ -27,9 +27,9 @@ class Species;
 
 
 //Global Varriables and Methods~~~~~~~~~~~~~~~~~~~~~~~~~
-#define BOXRADIUS
-#define BUTTONS
-#define INPUTS
+#define BOXRADIUS 6
+#define BUTTONS 13
+#define INPUTS 170
 using namespace std;
 using namespace System;
 
