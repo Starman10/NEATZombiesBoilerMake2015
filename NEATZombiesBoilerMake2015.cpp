@@ -179,19 +179,19 @@ Genome crossover(Genome g1, Genome g2) {
 	Genome child = Genome();
 
 	std::vector<Gene> innovations2;
-	for (int i = 0; i < g2.GeneList.size(); i++) {
-		Gene tempGene = g2.GeneList[i];
+	for (int i = 0; i < g2.geneList.size(); i++) {
+		Gene tempGene = g2.geneList[i];
 		innovations2[tempGene.innovation] = tempGene;
 	}
 
-	for (int i = 0; i < g1.GeneList.size(); i++) {
-		Gene Gene1 = g1.GeneList[i];
+	for (int i = 0; i < g1.geneList.size(); i++) {
+		Gene Gene1 = g1.geneList[i];
 		Gene Gene2 = innovations2[Gene1.innovation];
 		if (rand() % 2 == 1 && Gene2.enabled) {
-			child.GeneList.push_back(Gene(Gene2));
+			child.geneList.push_back(Gene(Gene2));
 		}
 		else {
-			child.GeneList.push_back(Gene(Gene1));
+			child.geneList.push_back(Gene(Gene1));
 		}
 	}
 	child.maxNeuron = max(g1.maxNeuron, g2.maxNeuron);
@@ -249,8 +249,8 @@ bool containsLink(std::vector<Gene> Genes, Gene link) {
 void pointMutate(Genome currGenome) {
 	double step = currGenome.mutationRates[6];
 
-	for (int i = 0; i < currGenome.GeneList.size(); i++) {
-		Gene tempGene = currGenome.GeneList[i];
+	for (int i = 0; i < currGenome.geneList.size(); i++) {
+		Gene tempGene = currGenome.geneList[i];
 		if (((double)rand() / (double)(RAND_MAX)) < PerturbChance) {
 			tempGene.weight = tempGene.weight +
 				((double)rand() / (double)(RAND_MAX))*step * 2
@@ -263,8 +263,8 @@ void pointMutate(Genome currGenome) {
 }
 
 void linkMutate(Genome currGenome, bool forceBias) {
-	int Neuron1 = randomNeuron(currGenome.GeneList, false);
-	int Neuron2 = randomNeuron(currGenome.GeneList, true);
+	int Neuron1 = randomNeuron(currGenome.geneList, false);
+	int Neuron2 = randomNeuron(currGenome.geneList, true);
 
 	Gene newLink = Gene();
 	if (Neuron1 <= Inputs && Neuron2 <= Inputs) {
@@ -282,21 +282,21 @@ void linkMutate(Genome currGenome, bool forceBias) {
 	if (forceBias) {
 		newLink.into = Inputs;
 	}
-	if (containsLink(currGenome.GeneList, newLink)) {
+	if (containsLink(currGenome.geneList, newLink)) {
 		return;
 	}
 	newLink.innovation = newLink.innovation + 1;
 	newLink.weight = ((double)rand() / (double)(RAND_MAX)) * 4 - 2;
-	currGenome.GeneList.push_back(newLink);
+	currGenome.geneList.push_back(newLink);
 	//STOPPED AT 485 of Seth
 }
 
 void nodeMutate(Genome currGenome) {
-	if (currGenome.GeneList.size() == 0) {
+	if (currGenome.geneList.size() == 0) {
 		return;
 	}
 	currGenome.maxNeuron = currGenome.maxNeuron + 1;
-	Gene currGene = currGenome.GeneList[rand() % currGenome.GeneList.size() + 1];
+	Gene currGene = currGenome.geneList[rand() % currGenome.geneList.size() + 1];
 	if (currGene.enabled) {
 		return;
 	}
@@ -307,21 +307,21 @@ void nodeMutate(Genome currGenome) {
 	Gene1.weight = 1.0;
 	Gene1.innovation++;
 	Gene1.enabled = true;
-	currGenome.GeneList.push_back(Gene1);
+	currGenome.geneList.push_back(Gene1);
 
 	Gene Gene2 = Gene(currGene);
 	Gene2.into = currGenome.maxNeuron;
 	Gene2.innovation++;
 	Gene2.enabled = true;
-	currGenome.GeneList.push_back(Gene2);
+	currGenome.geneList.push_back(Gene2);
 
 }
 
 void enableDisableMutate(Genome currGenome, bool enable) {
 	std::vector<Gene> candidates;
 	Gene tempGene;
-	for (int i = 0; i < currGenome.GeneList.size(); i++) {
-		tempGene = currGenome.GeneList[i];
+	for (int i = 0; i < currGenome.geneList.size(); i++) {
+		tempGene = currGenome.geneList[i];
 		if (tempGene.enabled == !enable) {
 			candidates.push_back(tempGene);
 		}
@@ -442,15 +442,15 @@ double weights(std::vector<Gene> Genes1, std::vector<Gene> Genes2) {
 }
 
 double sameSpecies(Genome Genome1, Genome Genome2) {
-	double dd = DeltaDisjoint*disjoint(Genome1.GeneList, Genome2.GeneList);
-	double dw = DeltaWeights*weights(Genome1.GeneList, Genome2.GeneList);
+	double dd = DeltaDisjoint*disjoint(Genome1.geneList, Genome2.geneList);
+	double dw = DeltaWeights*weights(Genome1.geneList, Genome2.geneList);
 	return dd + dw < DeltaThreshold;
 
 }
 
 void rankGlobally() {
 	std::vector<Genome> global;
-	for (int s = 0; s < globalPool.speciesList.size() s++) {
+	for (int s = 0; s < globalPool.speciesList.size(); s++) {
 		Species currSpecies = globalPool.speciesList[s];
 		for (int g = 0; g < currSpecies.GenomeList.size(); g++) {
 			global.push_back(currSpecies.GenomeList[g]);
@@ -501,7 +501,13 @@ void cullSpecies(bool cutToOne) {
 		};
 		std::sort(currSpecies.genomeList.begin(), currSpecies.genomeList.end(), by_out());
 
-		int remaining = ceil(Sp);
+		int remaining = ceil((double)currSpecies.GenomeList.size() / 2.0);
+		if (cutToOne) {
+			remaining = 1;
+		}
+		while (currSpecies.GenomeList.size() > remaining) {
+			
+		}
 
 	}
 }
