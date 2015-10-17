@@ -1,139 +1,64 @@
-#pragma once
+#include "NEATZombiesBoilerMake2015.h"
 #include "stdafx.h"
-#include "Neuron.cpp"
 #include <vector>
 #include <string>
 #include <algorithm>
-#include "Gene.cpp"
-
-#define BOXRADIUS 6
-#define BUTTONS 13
-#define MAXNODES 1000000
 
 
-class Genome
+
+class Network
 {
 public:
-	std::vector<Gene> GeneList;
-	int fitness;
-	int adjustedFitness;
-	//Network GenomeNetwork; replaced with std::vector<Neuron> NeuronList{ MAXNODES + BUTTONS };
-	int maxNeuron;
-	double mutationRates[7];
-	double MutateConnectionsChance = 0.25;
-	double PerturbChance = 0.90;
-	double CrossoverChance = 0.75;
-	double LinkMutationChance = 2.0;
-	double NodeMutationChance = 0.50;
-	double BiasMutationChance = 0.40;
-	double StepSize = 0.1;
-	std::vector<Neuron> NeuronList{ MAXNODES + BUTTONS };
+	vector<Neuron> neuronList{ MaxNodes + BUTTONS };
+	//not sure how he uses the neurons object in LUA need to investigate.
 
-	Genome()
+	Network() {}
+
+	Network(Genome genomeForNetwork)
 	{
-		std::vector<Gene> GeneList{};
-		fitness = 0;
-		adjustedFitness = 0;
-		NeuronList;
-		double MutateConnectionsChance = 0.25;
-		double PerturbChance = 0.90;
-		double CrossoverChance = 0.75;
-		double LinkMutationChance = 2.0;
-		double NodeMutationChance = 0.50;
-		double BiasMutationChance = 0.40;
-		double StepSize = 0.1;
-		double DisableMutationChance = 0.4;
-		double EnableMutationChance = 0.2;
-
-		maxNeuron = 0;
-		double mutationRates[7] = 
-		{
-			MutateConnectionsChance,//connections
-			LinkMutationChance,     //link
-			BiasMutationChance,		//bias
-			NodeMutationChance,		//node
-			EnableMutationChance,	//enable
-			DisableMutationChance,	//disable
-			StepSize				//step
-		};
-	}
-
-	//Useful source: http://en.cppreference.com/w/cpp/language/copy_constructor
-	Genome(const Genome& GenomeToCopy)
-	{
-		//Below might be useful for making a copy method instead (see the Gene class line 194-200)
-		//Genome copyOfGenome = new Genome();
-		for (int x = 1; x < GenomeToCopy.GeneList.capacity(); x++)
-		{
-			//need "table" to store Gene values here. See line 245-247 http://pastebin.com/ZZmSNaHX
-		}
-
-		//copying attributes
-		GeneList = GenomeToCopy.GeneList;
-		maxNeuron = GenomeToCopy.maxNeuron;
-		//copies the GenomeToCopy mutation rates into the new Genome. See
-		//http://stackoverflow.com/questions/16137953/is-there-a-function-to-copy-an-array-in-c-c answer 2
-		std::copy(std::begin(GenomeToCopy.mutationRates), std::end(GenomeToCopy.mutationRates), std::begin(mutationRates));
-	}
-
-	Genome generateBasicGenome() //equivalent of basicGenome line 263
-	{
-		Genome jeanGnome = Genome();
-		int innovation = 1;
-		maxNeuron = Inputs;
-		mutate(jeanGnome);    //need to write method!
-		return jeanGnome;
-	}
-
-	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Experimental ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	void generateNetwork(Genome baseGenome)
-	{
-		std::vector<Neuron> temp;
+		vector<Neuron> temp;
 		temp.assign((BOXRADIUS * 2 + 1)*(BOXRADIUS * 2 + 1), Neuron());
-		NeuronList = temp;
+		neuronList = temp;
 
-		for (int o = 1; o <= MAXNODES; o++)
+		for (int o = 1; o <= MaxNodes; o++)
 		{
-			NeuronList.at(MAXNODES + o) = Neuron();
+			neuronList.at(MaxNodes + o) = Neuron();
 		}
 
 		/*
 		TODO:
 		(311)
-		sort GenomeForNetwork.GeneList in terms of GeneList.out values
+		sort genomeForNetwork.geneList in terms of geneList.out values
 
-		table.sort(Genome.Genes, function (a,b)
+		table.sort(genome.genes, function (a,b)
 		return (a.out < b.out)
 		end)
 		Figured out below:
 		http://stackoverflow.com/questions/1723066/c-stl-custom-sorting-one-vector-based-on-contents-of-another
 		*/
-
 		struct by_out {
 			bool operator()(Gene a, Gene b) {
 				return a.out < b.out;
 			}
 		};
+		std::sort(neuronList.begin(), neuronList.end(), by_out());
 
-		std::sort(NeuronList.begin(), NeuronList.end(), by_out());
-
-		for (int i = 0; i < baseGenome.GeneList.size(); i++)
+		for (int i = 0; i < genomeForNetwork.geneList.size(); i++)
 		{
-			Gene currGene = baseGenome.GeneList[i];
+			Gene currGene = genomeForNetwork.geneList[i];
 			if (currGene.enabled)
 			{
 				/*
 				this check may be unneccesary
 				http://stackoverflow.com/questions/2099882/checking-for-a-null-object-in-c
-				if (NeuronList[currGene.out] == NULL) {
-				NeuronList[currGene.out] = Neuron();
+				if (neuronList[currGene.out] == NULL) {
+				neuronList[currGene.out] = neuron();
 				}
 				*/
-				Neuron tempNeuron = NeuronList[currGene.out];
+				Neuron tempNeuron = neuronList[currGene.out];
 				tempNeuron.incoming.push_back(currGene);
 			}
 		}
-		//NEEDS CHANGE: baseGenome.GenomeNetwork = *this;
+		genomeForNetwork.genomeNetwork = *this;
 	}
 };
-

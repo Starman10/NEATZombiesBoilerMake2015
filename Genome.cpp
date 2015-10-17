@@ -1,6 +1,5 @@
 #include "stdafx.h"
-#include "Gene.cpp"
-#include "Network.cpp"
+#include "NEATZombiesBoilerMake2015.h"
 #include <vector>
 #include <string.h>
 
@@ -12,36 +11,19 @@
 class Genome
 {
 public:
-	std::vector<Gene> GeneList;
+	std::vector<Gene> geneList;
 	int fitness;
 	int adjustedFitness;
-	Network GenomeNetwork;
+	Network genomeNetwork;
 	int maxNeuron;
 	double mutationRates[7];
-	double MutateConnectionsChance = 0.25;
-	double PerturbChance = 0.90;
-	double CrossoverChance = 0.75;
-	double LinkMutationChance = 2.0;
-	double NodeMutationChance = 0.50;
-	double BiasMutationChance = 0.40;
-	double StepSize = 0.1;
 
 	Genome()
 	{
-		std::vector<Gene> GeneList{};
+		vector<Gene> geneList{};
 		fitness = 0;
 		adjustedFitness = 0;
-		GenomeNetwork;
-		double MutateConnectionsChance = 0.25;
-		double PerturbChance = 0.90;
-		double CrossoverChance = 0.75;
-		double LinkMutationChance = 2.0;
-		double NodeMutationChance = 0.50;
-		double BiasMutationChance = 0.40;
-		double StepSize = 0.1;
-		double DisableMutationChance = 0.4;
-		double EnableMutationChance = 0.2;
-
+		genomeNetwork;
 		maxNeuron = 0;
 		double mutationRates[7] = {
 			MutateConnectionsChance,//connections
@@ -55,28 +37,28 @@ public:
 	}
 
 	//Useful source: http://en.cppreference.com/w/cpp/language/copy_constructor
-	Genome(const Genome& GenomeToCopy)
+	Genome(const Genome& genomeToCopy)
 	{
-		//Below might be useful for making a copy method instead (see the Gene class line 194-200)
-		//Genome copyOfGenome = new Genome();
-		for (int x = 1; x < GenomeToCopy.GeneList.capacity; x++)
+		//Below might be useful for making a copy method instead (see the gene class line 194-200)
+		//genome copyOfGenome = new genome();
+		for (int x = 1; x < genomeToCopy.geneList.capacity; x++)
 		{
-			//need "table" to store Gene values here. See line 245-247 http://pastebin.com/ZZmSNaHX
+			//need "table" to store gene values here. See line 245-247 http://pastebin.com/ZZmSNaHX
 		}
 
 		//copying attributes
-		GeneList = GenomeToCopy.GeneList;
-		maxNeuron = GenomeToCopy.maxNeuron;
-		//copies the GenomeToCopy mutation rates into the new Genome. See
+		geneList = genomeToCopy.geneList;
+		maxNeuron = genomeToCopy.maxNeuron;
+		//copies the genomeToCopy mutation rates into the new genome. See
 		//http://stackoverflow.com/questions/16137953/is-there-a-function-to-copy-an-array-in-c-c answer 2
-		std::copy(std::begin(GenomeToCopy.mutationRates), std::end(GenomeToCopy.mutationRates), std::begin(mutationRates));
+		std::copy(std::begin(genomeToCopy.mutationRates), std::end(genomeToCopy.mutationRates), std::begin(mutationRates));
 	}
 
 	Genome(string basic) //equivalent of basicGenome line 263
 	{
 		Genome jean = Genome();
 		int innovation = 1;
-		maxNeuron = INPUTS;
+		maxNeuron = Inputs;
 		mutate(jean);    //need to write method!
 	}
 };

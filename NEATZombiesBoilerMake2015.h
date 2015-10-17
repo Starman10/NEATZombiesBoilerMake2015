@@ -103,10 +103,11 @@ class Species
 {
 public:
 
-	int topFitness;
-	int staleness;
+	double topFitness;
+	double staleness;
 	std::vector<Genome> GenomeList;
-	int averageFitness;
+	double averageFitness;
+	
 	Species()
 	{}
 }; //end of Species class
@@ -114,7 +115,7 @@ public:
 class Pool
 {
 public:
-	Species spec;
+	std::vector<Species> speciesList;
 	int generation;
 	int innovation; //size of ControlNames array 
 	int currentSpecies;
