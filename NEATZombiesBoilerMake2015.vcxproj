@@ -89,7 +89,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="Gene.cpp" />
+    <ClCompile Include="Genome.cpp" />
     <ClCompile Include="NEATZombiesBoilerMake2015.cpp" />
+    <ClCompile Include="Network.cpp" />
+    <ClCompile Include="Neuron.cpp" />
+    <ClCompile Include="Pool.cpp" />
+    <ClCompile Include="Species.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

@@ -3,21 +3,29 @@
 #include "stdafx.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include "Network.cpp"
+#include "Neuron.cpp"
+#include "Gene.cpp"
+#include "Genome.cpp"
+#include "Pool.cpp"
+#include "Species.cpp"
 
 #define BOXRADIUS 6
 #define BUTTONS 13
 using namespace std;
 using namespace System;
 
-int main(array<System::String ^> ^args)
+int main()
 {
     Console::WriteLine(L"Hello World");
     return 0;
 }
 
+class Pool;
 
 int inputSize = (BOXRADIUS * 2 + 1) * (BOXRADIUS * 2 + 1);
 int Inputs = inputSize + 1;
@@ -62,13 +70,7 @@ double EnableMutationChance = 0.2;
 int TimeoutConstant = 20;
 
 int MaxNodes = 1000000;
-pool globalPool;
-
-int main()
-{
-	std::cout << "Hello World!";
-
-}
+Pool globalPool = Pool();
 
 int* getPositions() {
 	int playerPosition[2];
@@ -122,236 +124,39 @@ double sigmoid(double x) {
 
 
 
-class pool {
-public:
-	species spec;
-	int generation;
-	int innovation; //size of ControlNames array 
-	int currentSpecies;
-	int currentGenome;
-	int currentFrame;
-	int maxFitness;
-	pool() {
-		species spec;
-		generation = 0;
-		innovation = BUTTONS; //size of ControlNames array 
-		currentSpecies = 1;
-		currentGenome = 1;
-		currentFrame = 0;
-		maxFitness = 0;
-	}
-
-};
-
-class species {
-public:
-
-	int topFitness;
-	int staleness;
-	std::vector<genome> genomeList;
-	int averageFitness;
-	species() {
-		topFitness = 0;
-		staleness = 0;
-		averageFitness = 0;
-	}
-};
-
-class genome
-{
-public:
-	std::vector<gene> geneList;
-	int fitness;
-	int adjustedFitness;
-	network genomeNetwork;
-	int maxNeuron;
-	double mutationRates[7];
-
-	genome()
-	{
-		vector<gene> geneList{};
-		fitness = 0;
-		adjustedFitness = 0;
-		genomeNetwork;
-		maxNeuron = 0;
-		double mutationRates[7] = {
-			MutateConnectionsChance,//connections
-			LinkMutationChance,     //link
-			BiasMutationChance,		//bias
-			NodeMutationChance,		//node
-			EnableMutationChance,	//enable
-			DisableMutationChance,	//disable
-			StepSize				//step
-		};
-	}
-
-	//Useful source: http://en.cppreference.com/w/cpp/language/copy_constructor
-	genome(const genome& genomeToCopy)
-	{
-		//Below might be useful for making a copy method instead (see the gene class line 194-200)
-		//genome copyOfGenome = new genome();
-		for (int x = 1; x < genomeToCopy.geneList.capacity; x++)
-		{
-			//need "table" to store gene values here. See line 245-247 http://pastebin.com/ZZmSNaHX
-		}
-
-		//copying attributes
-		geneList = genomeToCopy.geneList;
-		maxNeuron = genomeToCopy.maxNeuron;
-		//copies the genomeToCopy mutation rates into the new genome. See
-		//http://stackoverflow.com/questions/16137953/is-there-a-function-to-copy-an-array-in-c-c answer 2
-		std::copy(std::begin(genomeToCopy.mutationRates), std::end(genomeToCopy.mutationRates), std::begin(mutationRates));
-	}
-
-	genome(string basic) //equivalent of basicGenome line 263
-	{
-		genome jean = genome();
-		int innovation = 1;
-		maxNeuron = Inputs;
-		mutate(jean);    //need to write method!
-	}
-};
 
 
 
-class gene {
-public:
-	int into;
-	int out;
-	double weight;
-	bool enabled;
-	int innovation;
 
-	gene()
-	{
-		int into = 0;
-		int out = 0;
-		double weight = 0.0;
-		bool enabled = true;
-		int innovation = 0;
-	}
-
-	//the "Copy" overloaded constructors might be better off as methods,
-	//in Sethbling's script the copy is returned.
-	gene(const gene& geneToCopy)
-	{
-		//gene copyOfGene = new gene();  //<< this would be useful if we wanted to use a method
-		//we would then return copy of gene after assigning object values as so:
-		//copyOfGene.out = geneToCopy.out;
-
-		//copying attributes
-		into = geneToCopy.into;
-		out = geneToCopy.out;
-		weight = geneToCopy.weight;
-		enabled = geneToCopy.enabled;
-		innovation = geneToCopy.innovation;
-	}
-
-
-};
-
-class neuron
-{
-public:
-	std::vector<gene> incoming;
-	//Line 321 of seth's code indicates it's a gene array
-
-	double value;
-
-	neuron()
-	{
-		value = 0.0;
-		//	incoming = 0; //subject to change... should remove
-	}
-};
-
-
-class network
-{
-public:
-	vector<neuron> neuronList{ MaxNodes + BUTTONS };
-	//not sure how he uses the neurons object in LUA need to investigate.
-
-	network() {}
-
-	network(genome genomeForNetwork)
-	{
-		vector<neuron> temp;
-		temp.assign((BOXRADIUS * 2 + 1)*(BOXRADIUS * 2 + 1), neuron());
-		neuronList = temp;
-
-		for (int o = 1; o <= MaxNodes; o++)
-		{
-			neuronList.at(MaxNodes + o) = neuron();
-		}
-
-		/*
-		TODO:
-		(311)
-		sort genomeForNetwork.geneList in terms of geneList.out values
-
-		table.sort(genome.genes, function (a,b)
-		return (a.out < b.out)
-		end)
-		Figured out below:
-		http://stackoverflow.com/questions/1723066/c-stl-custom-sorting-one-vector-based-on-contents-of-another
-		*/
-		struct by_out {
-			bool operator()(gene a, gene b) {
-				return a.out < b.out;
-			}
-		};
-		std::sort(neuronList.begin(), neuronList.end(), by_out());
-
-		for (int i = 0; i < genomeForNetwork.geneList.size(); i++)
-		{
-			gene currGene = genomeForNetwork.geneList[i];
-			if (currGene.enabled)
-			{
-				/*
-				this check may be unneccesary
-				http://stackoverflow.com/questions/2099882/checking-for-a-null-object-in-c
-				if (neuronList[currGene.out] == NULL) {
-				neuronList[currGene.out] = neuron();
-				}
-				*/
-				neuron tempNeuron = neuronList[currGene.out];
-				tempNeuron.incoming.push_back(currGene);
-			}
-		}
-		genomeForNetwork.genomeNetwork = *this;
-	}
-};
-
-std::vector<double> evaluateNetwork(network currNet, std::vector<double> currInputs) {
+std::vector<double> evaluateNetwork(Network currNet, std::vector<double> currInputs) {
 	currInputs.push_back(1.0);
 
 	if (currInputs.size() != Inputs) {
-		cout << "Incorrect number of neural network inputs.\n";
+		cout << "Incorrect number of neural Network inputs.\n";
 		return;
 	}
 	for (int i = 0; i < Inputs; i++)
 	{
-		currNet.neuronList[i].value = currInputs[i];
+		currNet.NeuronList[i].value = currInputs[i];
 	}
 	//http://www.lua.org/pil/7.2.html
 	//don't know how to replicate this:
-	//for _,neuron in pairs(network.neurons) do
-	for (int i = 0; i < currNet.neuronList.size(); i++) {
+	//for _,Neuron in pairs(Network.Neurons) do
+	for (int i = 0; i < currNet.NeuronList.size(); i++) {
 		int tempSum = 0;
-		for (int j = 0; j < currNet.neuronList[i].incoming.size(); j++) {
-			gene tempIncoming = currNet.neuronList[i].incoming[j];
-			neuron other = currNet.neuronList[tempIncoming.into];
+		for (int j = 0; j < currNet.NeuronList[i].incoming.size(); j++) {
+			Gene tempIncoming = currNet.NeuronList[i].incoming[j];
+			Neuron other = currNet.NeuronList[tempIncoming.into];
 			tempSum = tempSum + tempIncoming.weight * other.value;
 		}
-		if (currNet.neuronList[i].incoming.size() > 0) {
-			currNet.neuronList[i].value = sigmoid(tempSum);
+		if (currNet.NeuronList[i].incoming.size() > 0) {
+			currNet.NeuronList[i].value = sigmoid(tempSum);
 		}
 	}
 	std::vector<double> outputs;
 	for (int o = 1; o < BUTTONS + 1; o++) {
 		string button = "P1 " + ControlNames[o];
-		if (currNet.neuronList[MaxNodes + o].value > 0)
+		if (currNet.NeuronList[MaxNodes + o].value > 0)
 		{
 			outputs[o] = true;
 		} // lines 359-361 imply outputs[string] = true which makes no sense...?
@@ -362,29 +167,29 @@ std::vector<double> evaluateNetwork(network currNet, std::vector<double> currInp
 	return outputs;
 }
 
-genome crossover(genome g1, genome g2) {
+Genome crossover(Genome g1, Genome g2) {
 	if (g2.fitness > g1.fitness) {
-		genome tempg = g1;
+		Genome tempg = g1;
 		g1 = g2;
 		g2 = tempg;
 	}
 
-	genome child = genome();
+	Genome child = Genome();
 
-	std::vector<gene> innovations2;
-	for (int i = 0; i < g2.geneList.size(); i++) {
-		gene tempGene = g2.geneList[i];
+	std::vector<Gene> innovations2;
+	for (int i = 0; i < g2.GeneList.size(); i++) {
+		Gene tempGene = g2.GeneList[i];
 		innovations2[tempGene.innovation] = tempGene;
 	}
 
-	for (int i = 0; i < g1.geneList.size(); i++) {
-		gene gene1 = g1.geneList[i];
-		gene gene2 = innovations2[gene1.innovation];
-		if (rand() % 2 == 1 && gene2.enabled) {
-			child.geneList.push_back(gene(gene2));
+	for (int i = 0; i < g1.GeneList.size(); i++) {
+		Gene Gene1 = g1.GeneList[i];
+		Gene Gene2 = innovations2[Gene1.innovation];
+		if (rand() % 2 == 1 && Gene2.enabled) {
+			child.GeneList.push_back(Gene(Gene2));
 		}
 		else {
-			child.geneList.push_back(gene(gene1));
+			child.GeneList.push_back(Gene(Gene1));
 		}
 	}
 	child.maxNeuron = max(g1.maxNeuron, g2.maxNeuron);
@@ -396,32 +201,32 @@ genome crossover(genome g1, genome g2) {
 	return child;
 }
 
-int randomNeuron(std::vector<gene> genes, bool nonInput) {
-	std::vector<bool> neurons;
+int randomNeuron(std::vector<Gene> Genes, bool nonInput) {
+	std::vector<bool> Neurons;
 	if (!nonInput) {
 		for (int i = 0; i < Inputs; i++) {
-			neurons[i] = true;
+			Neurons[i] = true;
 		}
 	}
 
 	for (int o = 1; o < BUTTONS; o++) {
-		neurons[MaxNodes + o] = true;
+		Neurons[MaxNodes + o] = true;
 	}
-	for (int i = 0; i < genes.size(); i++) {
-		if (!nonInput || genes[i].into > Inputs) {
-			neurons[genes[i].into] = true;
+	for (int i = 0; i < Genes.size(); i++) {
+		if (!nonInput || Genes[i].into > Inputs) {
+			Neurons[Genes[i].into] = true;
 		}
-		if (!nonInput || genes[i].out > Inputs) {
-			neurons[genes[i].out] = true;
+		if (!nonInput || Genes[i].out > Inputs) {
+			Neurons[Genes[i].out] = true;
 		}
 	}
 	int count = 0;
-	for (int i = 0; i < neurons.size(); i++) {
+	for (int i = 0; i < Neurons.size(); i++) {
 		count = count + 1;
 	}
 	int n = rand() % count + 1;
 
-	for (int i = 0; i < neurons.size(); i++) {
+	for (int i = 0; i < Neurons.size(); i++) {
 		n = n - 1;
 		if (n == 0) {
 			return i;
@@ -430,20 +235,20 @@ int randomNeuron(std::vector<gene> genes, bool nonInput) {
 	return 0;
 }
 
-bool containsLink(std::vector<gene> genes, gene link) {
-	for (int i = 0; i < genes.size(); i++) {
-		gene tempGene = genes[i];
+bool containsLink(std::vector<Gene> Genes, Gene link) {
+	for (int i = 0; i < Genes.size(); i++) {
+		Gene tempGene = Genes[i];
 		if (tempGene.into == link.into && tempGene.out == link.out) {
 			return true;
 		}
 	}
 }
 
-void pointMutate(genome currGenome) {
+void pointMutate(Genome currGenome) {
 	double step = currGenome.mutationRates[6];
 
-	for (int i = 0; i < currGenome.geneList.size(); i++) {
-		gene tempGene = currGenome.geneList[i];
+	for (int i = 0; i < currGenome.GeneList.size(); i++) {
+		Gene tempGene = currGenome.GeneList[i];
 		if (((double)rand() / (double)(RAND_MAX)) < PerturbChance) {
 			tempGene.weight = tempGene.weight +
 				((double)rand() / (double)(RAND_MAX))*step * 2
@@ -455,66 +260,66 @@ void pointMutate(genome currGenome) {
 	}
 }
 
-void linkMutate(genome currGenome, bool forceBias) {
-	int neuron1 = randomNeuron(currGenome.geneList, false);
-	int neuron2 = randomNeuron(currGenome.geneList, true);
+void linkMutate(Genome currGenome, bool forceBias) {
+	int Neuron1 = randomNeuron(currGenome.GeneList, false);
+	int Neuron2 = randomNeuron(currGenome.GeneList, true);
 
-	gene newLink = gene();
-	if (neuron1 <= Inputs && neuron2 <= Inputs) {
+	Gene newLink = Gene();
+	if (Neuron1 <= Inputs && Neuron2 <= Inputs) {
 		return;
 	}
-	if (neuron2 <= Inputs) {
-		int temp = neuron1;
-		neuron1 = neuron2;
-		neuron2 = temp;
+	if (Neuron2 <= Inputs) {
+		int temp = Neuron1;
+		Neuron1 = Neuron2;
+		Neuron2 = temp;
 	}
 
-	newLink.into = neuron1;
-	newLink.out = neuron2;
+	newLink.into = Neuron1;
+	newLink.out = Neuron2;
 
 	if (forceBias) {
 		newLink.into = Inputs;
 	}
-	if (containsLink(currGenome.geneList, newLink)) {
+	if (containsLink(currGenome.GeneList, newLink)) {
 		return;
 	}
 	newLink.innovation = newLink.innovation + 1;
 	newLink.weight = ((double)rand() / (double)(RAND_MAX)) * 4 - 2;
-	currGenome.geneList.push_back(newLink);
+	currGenome.GeneList.push_back(newLink);
 	//STOPPED AT 485 of Seth
 }
 
-void nodeMutate(genome currGenome) {
-	if (currGenome.geneList.size() == 0) {
+void nodeMutate(Genome currGenome) {
+	if (currGenome.GeneList.size() == 0) {
 		return;
 	}
 	currGenome.maxNeuron = currGenome.maxNeuron + 1;
-	gene currGene = currGenome.geneList[rand() % currGenome.geneList.size() + 1];
+	Gene currGene = currGenome.GeneList[rand() % currGenome.GeneList.size() + 1];
 	if (currGene.enabled) {
 		return;
 	}
 	currGene.enabled = false;
 
-	gene gene1 = gene(currGene);
-	gene1.out = currGenome.maxNeuron;
-	gene1.weight = 1.0;
-	gene1.innovation++;
-	gene1.enabled = true;
-	currGenome.geneList.push_back(gene1);
+	Gene Gene1 = Gene(currGene);
+	Gene1.out = currGenome.maxNeuron;
+	Gene1.weight = 1.0;
+	Gene1.innovation++;
+	Gene1.enabled = true;
+	currGenome.GeneList.push_back(Gene1);
 
-	gene gene2 = gene(currGene);
-	gene2.into = currGenome.maxNeuron;
-	gene2.innovation++;
-	gene2.enabled = true;
-	currGenome.geneList.push_back(gene2);
+	Gene Gene2 = Gene(currGene);
+	Gene2.into = currGenome.maxNeuron;
+	Gene2.innovation++;
+	Gene2.enabled = true;
+	currGenome.GeneList.push_back(Gene2);
 
 }
 
-void enableDisableMutate(genome currGenome, bool enable) {
-	std::vector<gene> candidates;
-	gene tempGene;
-	for (int i = 0; i < currGenome.geneList.size(); i++) {
-		tempGene = currGenome.geneList[i];
+void enableDisableMutate(Genome currGenome, bool enable) {
+	std::vector<Gene> candidates;
+	Gene tempGene;
+	for (int i = 0; i < currGenome.GeneList.size(); i++) {
+		tempGene = currGenome.GeneList[i];
 		if (tempGene.enabled == !enable) {
 			candidates.push_back(tempGene);
 		}
@@ -522,11 +327,11 @@ void enableDisableMutate(genome currGenome, bool enable) {
 	if (candidates.size() == 0) {
 		return;
 	}
-	gene randGene = candidates[rand() % candidates.size()];
+	Gene randGene = candidates[rand() % candidates.size()];
 	randGene.enabled = !randGene.enabled;
 }
 
-void mutate(genome currGenome) {
+void mutate(Genome currGenome) {
 	for (int i = 0; i < 7; i++) {
 		double rate = currGenome.mutationRates[i];
 		if ((rand() % 2) < 1) {
@@ -585,48 +390,48 @@ void mutate(genome currGenome) {
 }
 
 //588
-double disjoint(std::vector<gene> genes1, std::vector<gene> genes2) {
+double disjoint(std::vector<Gene> Genes1, std::vector<Gene> Genes2) {
 	std::vector<bool> i1;
-	for (int i = 0; i < genes1.size(); i++) {
-		gene currGene = genes1[i];
+	for (int i = 0; i < Genes1.size(); i++) {
+		Gene currGene = Genes1[i];
 		i1[currGene.innovation] = true;
 	}
 
 	std::vector<bool> i2;
-	for (int i = 0; i < genes2.size(); i++) {
-		gene currGene = genes2[i];
+	for (int i = 0; i < Genes2.size(); i++) {
+		Gene currGene = Genes2[i];
 		i2[currGene.innovation] = true;
 	}
 
 	int disjointGenes = 0;
-	for (int i = 0; i < genes1.size(); i++) {
-		gene currGene = genes1[i];
+	for (int i = 0; i < Genes1.size(); i++) {
+		Gene currGene = Genes1[i];
 		if (!i2[currGene.innovation]) {
 			disjointGenes = disjointGenes + 1;
 		}
 	}
-	for (int i = 0; i < genes2.size(); i++) {
-		gene currGene = genes2[i];
+	for (int i = 0; i < Genes2.size(); i++) {
+		Gene currGene = Genes2[i];
 		if (!i1[currGene.innovation]) {
 			disjointGenes = disjointGenes + 1;
 		}
 	}
-	return (double)disjointGenes / (double)std::max(genes1.size(), genes2.size());
+	return (double)disjointGenes / (double)std::max(Genes1.size(), Genes2.size());
 }
 
 //621
-double weights(std::vector<gene> genes1, std::vector<gene> genes2) {
-	std::vector<gene> i2;
-	for (int i = 0; i < genes2.size(); i++) {
-		gene currGene = genes2[i];
+double weights(std::vector<Gene> Genes1, std::vector<Gene> Genes2) {
+	std::vector<Gene> i2;
+	for (int i = 0; i < Genes2.size(); i++) {
+		Gene currGene = Genes2[i];
 		i2[currGene.innovation] = currGene;
 	}
 	int sum = 0;
 	int coincident = 0;
-	for (int i = 0; i < genes1.size(); i++) {
-		gene currGene = genes1[i];
-		//not needed? if (i2[gene.innovation] != NULL) {
-		gene currGene2 = i2[currGene.innovation];
+	for (int i = 0; i < Genes1.size(); i++) {
+		Gene currGene = Genes1[i];
+		//not needed? if (i2[Gene.innovation] != NULL) {
+		Gene currGene2 = i2[currGene.innovation];
 		sum = sum + std::abs(currGene.weight - currGene2.weight);
 		coincident = coincident + 1;
 		//}
@@ -634,27 +439,27 @@ double weights(std::vector<gene> genes1, std::vector<gene> genes2) {
 	return sum / coincident;
 }
 
-double sameSpecies(genome genome1, genome genome2) {
-	double dd = DeltaDisjoint*disjoint(genome1.geneList, genome2.geneList);
-	double dw = DeltaWeights*weights(genome1.geneList, genome2.geneList);
+double sameSpecies(Genome Genome1, Genome Genome2) {
+	double dd = DeltaDisjoint*disjoint(Genome1.GeneList, Genome2.GeneList);
+	double dw = DeltaWeights*weights(Genome1.GeneList, Genome2.GeneList);
 	return dd + dw < DeltaThreshold;
 
 }
 
 void rankGlobally() {
-	std::vector<genome> global;
-	for (int s = 0; s < globalPool.genomeList.size(); s++) {
-		species currSpecies = globalPool.species[s];
-		for (int g = 0; g < currSpecies.genomeList.size(); g++) {
-			global.push_back(currSpecies.genomeList[g]);
+	std::vector<Genome> global;
+	for (int s = 0; s < globalPool.GenomeList.size(); s++) {
+		Species currSpecies = globalPool.Species[s];
+		for (int g = 0; g < currSpecies.GenomeList.size(); g++) {
+			global.push_back(currSpecies.GenomeList[g]);
 		}
 	}
 	struct by_out {
-		bool operator()(gene a, gene b) {
+		bool operator()(Gene a, Gene b) {
 			return a.out < b.out;
 		}
 	};
-	std::sort(neuronList.begin(), neuronList.end(), by_out());
+	std::sort(NeuronList.begin(), NeuronList.end(), by_out());
 
 
 }
