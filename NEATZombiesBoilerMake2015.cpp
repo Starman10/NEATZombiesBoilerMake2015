@@ -448,8 +448,8 @@ void rankGlobally() {
 	std::vector<Genome> global;
 	for (int s = 0; s < globalPool.speciesList.size(); s++) {
 		Species currSpecies = globalPool.speciesList[s];
-		for (int g = 0; g < currSpecies.GenomeList.size(); g++) {
-			global.push_back(currSpecies.GenomeList[g]);
+		for (int g = 0; g < currSpecies.genomeList.size(); g++) {
+			global.push_back(currSpecies.genomeList[g]);
 		}
 	}
 	struct by_out {
@@ -469,8 +469,8 @@ void rankGlobally() {
 void calculateAverageFitness(Species currSpecies) {
 	int total = 0;
 	int g;
-	for (g = 0; g < currSpecies.GenomeList.size(); g++) {
-		Genome currGenome = currSpecies.GenomeList[g];
+	for (g = 0; g < currSpecies.genomeList.size(); g++) {
+		Genome currGenome = currSpecies.genomeList[g];
 		total = total + currGenome.globalRank;
 //NEED TO ADD GLOBAL RANK TO GENOME CONSTRUCTOR
 	}
@@ -488,8 +488,7 @@ double totalAverageFitness() {
 
 void cullSpecies(bool cutToOne) {
 	for (int s = 0; s < globalPool.speciesList.size(); s++) {
-		Species currSpecies;
-		currSpecies = globalPool.speciesList[s];
+		Species currSpecies = globalPool.speciesList[s];
 
 		struct by_out {
 			bool operator()(Genome a, Genome b) {
@@ -498,11 +497,11 @@ void cullSpecies(bool cutToOne) {
 		};
 		std::sort(currSpecies.genomeList.begin(), currSpecies.genomeList.end(), by_out());
 
-		int remaining = ceil((double)currSpecies.GenomeList.size() / 2.0);
+		int remaining = ceil((double)currSpecies.genomeList.size() / 2.0);
 		if (cutToOne) {
 			remaining = 1;
 		}
-		while (currSpecies.GenomeList.size() > remaining) {
+		while (currSpecies.genomeList.size() > remaining) {
 			
 		}
 

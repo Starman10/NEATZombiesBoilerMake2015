@@ -18,12 +18,12 @@ class Species;
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include "Network.cpp"
+/*#include "Network.cpp"
 #include "Neuron.cpp"
 #include "Gene.cpp"
 #include "Genome.cpp"
 #include "Pool.cpp"
-#include "Species.cpp"
+#include "Species.cpp"*/
 
 
 //Global Varriables and Methods~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -34,69 +34,66 @@ using namespace std;
 using namespace System;
 
 
-int inputSize;
-int Inputs;
+extern int inputSize;
+extern int Inputs;
 //Seth's scanning area of blocks centered on mario
-vector<double> inputs();
+extern std::vector<double> inputs;
 // input of only 
 //zombie coordinates, need to include ALL inputs
 
-string ControlNames[BUTTONS];
+extern string ControlNames[BUTTONS];
 
-int population;
-double DeltaDisjoint;
-double DeltaWeights;
-double DetalThreshold;
+extern int population;
+extern double DeltaDisjoint;
+extern double DeltaWeights;
+extern double DetalThreshold;
 
-int StaleSpecies;
+extern int StaleSpecies;
 
-double MutateConnectionsChance;
-double PerturbChance;
-double CrossoverChance;
-double LinkMutationChance;
-double NodeMutationChance;
-double BiasMutationChance;
-double StepSize;
-double DisableMutationChance;
-double EnableMutationChance;
+extern double MutateConnectionsChance;
+extern double PerturbChance;
+extern double CrossoverChance;
+extern double LinkMutationChance;
+extern double NodeMutationChance;
+extern double BiasMutationChance;
+extern double StepSize;
+extern double DisableMutationChance;
+extern double EnableMutationChance;
 
-int TimeoutConstant;
-int MaxNodes;
-Pool globalPool;
+extern int TimeoutConstant;
+extern int MaxNodes;
 
-int* getPosition() {}
+int* getPosition();
 
-int* getZombies() {}
+int* getZombies();
 
-bool** getInputs() {}
+bool** getInputs();
 
-double signmoid(double x) {}
+double signmoid(double x);
 
-std::vector<double> evaluateNetwork(Network currNet, std::vector<double> currInputs) {}
+std::vector<double> evaluateNetwork(Network currNet, std::vector<double> currInputs);
 
-Genome crossover(Genome g1, Genome g2) {}
+int randomNeuron(std::vector<Gene> Genes, bool nonInput);
 
-int randomNeuron(std::vector<Gene> Genes, bool nonInput) {}
+bool containsLink(std::vector<Gene> Genes, Gene link);
 
-bool containsLink(std::vector<Gene> Genes, Gene link) {}
+void pointMutate(Genome currGenome);
 
-void pointMutate(Genome currGenome) {}
+void linkMutate(Genome currGenome, bool forceBias);
 
-void linkMutate(Genome currGenome, bool forceBias) {}
+void nodeMutate(Genome currGenome);
 
-void nodeMutate(Genome currGenome) {}
+void enableDisableMutate(Genome currGenome, bool enable);
 
-void enableDisableMutate(Genome currGenome, bool enable) {}
+void mutate(Genome currGenome);
 
-void mutate(Genome currGenome) {}
+double disjoint(std::vector<Gene> Genes1, std::vector<Gene> Genes2);
 
-double disjoint(std::vector<Gene> Genes1, std::vector<Gene> Genes2) {}
+double weights(std::vector<Gene> Genes1, std::vector<Gene> Genes2);
 
-double weights(std::vector<Gene> Genes1, std::vector<Gene> Genes2) {}
+double sameSpecies(Genome Genome1, Genome Genome2);
 
-double sameSpecies(Genome Genome1, Genome Genome2) {}
-
-void rankGlobally() {}
+void rankGlobally();
 
 
 class Species 
@@ -105,11 +102,10 @@ public:
 
 	double topFitness;
 	double staleness;
-	std::vector<Genome> GenomeList;
+	std::vector<Genome> genomeList;
 	double averageFitness;
-	
-	Species()
-	{}
+	Species();
+
 }; //end of Species class
 
 class Pool
@@ -123,9 +119,11 @@ public:
 	int currentFrame;
 	int maxFitness;
 
-	Pool()
-	{}
+	Pool();
+
 }; //end of Pool class
+
+extern Pool globalPool;
 
 class Gene 
 {
@@ -136,30 +134,29 @@ public:
 	bool enabled;
 	int innovation;
 
-	Gene()
-	{ }
+	Gene();
 
-	Gene(const Gene& GeneToCopy)
-	{ }
+	Gene(const Gene& GeneToCopy);
 }; //End of Gene Class
 
 class Network
 {
+public:
 	vector<Neuron> neuronList;
 
-	Network() { };
+	Network();
 
-	Network(Genome genomeForNetwork)
-	{ }
+	Network(Genome genomeForNetwork);
 
 }; //end of Network Class
+
 class Genome
 {
 public:
-	std::vector<Gene> GeneList;
+	std::vector<Gene> geneList;
 	int fitness;
 	int adjustedFitness;
-	Network GenomeNetwork;
+	Network genomeNetwork;
 	int maxNeuron;
 	double mutationRates[7];
 	double MutateConnectionsChance;
@@ -169,17 +166,17 @@ public:
 	double NodeMutationChance;
 	double BiasMutationChance;
 	double StepSize;
+	int globalRank;
 
-	Genome()
-	{ }
+	Genome();
 
-	Genome(const Genome& GenomeToCopy)
-	{ }
+	Genome(const Genome& GenomeToCopy);
 
-	Genome(string basic) //equivalent of basicGenome line 263
-	{ }
+	Genome(string basic); //equivalent of basicGenome line 263
 
 }; //end of Genome Class
+
+Genome crossover(Genome g1, Genome g2) {}
 
 class Neuron
 {
@@ -188,10 +185,7 @@ class Neuron
 
 		double value;
 
-		Neuron()
-		{
-
-		}
+		Neuron();
 }; //end of Neuron Class
 
 

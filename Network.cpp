@@ -1,21 +1,16 @@
-#include "NEATZombiesBoilerMake2015.h"
 #include "stdafx.h"
 #include <vector>
 #include <string>
 #include <algorithm>
+#include "NEATZombiesBoilerMake2015.h"
 
-
-
-class Network
-{
-public:
-	vector<Neuron> neuronList{ MaxNodes + BUTTONS };
 	//not sure how he uses the neurons object in LUA need to investigate.
 
-	Network() {}
+	Network::Network() {}
 
-	Network(Genome genomeForNetwork)
+	Network::Network(Genome genomeForNetwork)
 	{
+		neuronList = vector<Neuron>{ MaxNodes + BUTTONS };
 		vector<Neuron> temp;
 		temp.assign((BOXRADIUS * 2 + 1)*(BOXRADIUS * 2 + 1), Neuron());
 		neuronList = temp;
@@ -61,4 +56,3 @@ public:
 		}
 		genomeForNetwork.genomeNetwork = *this;
 	}
-};

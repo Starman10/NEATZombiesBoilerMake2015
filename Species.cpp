@@ -1,17 +1,14 @@
 #include "stdafx.h"
+#pragma once
+
 #include "NEATZombiesBoilerMake2015.h"
-#include <vector>
 
-class Species {
-public:
 
-	double topFitness;
-	double staleness;
-	std::vector<Genome> GenomeList;
-	double averageFitness;
-	Species() {
+//See: http://stackoverflow.com/questions/13484178/class-type-redefinition-error-between-header-and-source-files
+//For why this works & how
+	Species::Species() 
+	{
 		topFitness = 0;
 		staleness = 0;
 		averageFitness = 0;
 	}
-};

@@ -7,23 +7,13 @@
 #define BUTTONS 13
 #define INPUTS 170
 
-
-class Genome
-{
-public:
-	std::vector<Gene> geneList;
-	int fitness;
-	int adjustedFitness;
-	Network genomeNetwork;
-	int maxNeuron;
-	double mutationRates[7];
-
-	Genome()
+	Genome::Genome()
 	{
 		vector<Gene> geneList{};
 		fitness = 0;
 		adjustedFitness = 0;
-		genomeNetwork;
+		globalRank = 0;
+		genomeNetwork; //needs fixing
 		maxNeuron = 0;
 		double mutationRates[7] = {
 			MutateConnectionsChance,//connections
@@ -37,7 +27,7 @@ public:
 	}
 
 	//Useful source: http://en.cppreference.com/w/cpp/language/copy_constructor
-	Genome(const Genome& genomeToCopy)
+	Genome::Genome(const Genome& genomeToCopy)
 	{
 		//Below might be useful for making a copy method instead (see the gene class line 194-200)
 		//genome copyOfGenome = new genome();
@@ -54,11 +44,10 @@ public:
 		std::copy(std::begin(genomeToCopy.mutationRates), std::end(genomeToCopy.mutationRates), std::begin(mutationRates));
 	}
 
-	Genome(string basic) //equivalent of basicGenome line 263
+	Genome::Genome(string basic) //equivalent of basicGenome line 263
 	{
 		Genome jean = Genome();
 		int innovation = 1;
 		maxNeuron = Inputs;
 		mutate(jean);    //need to write method!
 	}
-};
