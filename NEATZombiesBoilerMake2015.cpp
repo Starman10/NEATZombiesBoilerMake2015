@@ -492,15 +492,16 @@ double totalAverageFitness() {
 
 void cullSpecies(bool cutToOne) {
 	for (int s = 0; s < globalPool.speciesList.size(); s++) {
-		Species = globalPool.speciesList[s];
+		Species currSpecies = globalPool.speciesList[s];
 
 		struct by_out {
 			bool operator()(Genome a, Genome b) {
 				return a.fitness > b.fitness;
 			}
 		};
-		std::sort(Species.genomeList.begin(), Species.genomeList.end(), by_out());
+		std::sort(currSpecies.genomeList.begin(), currSpecies.genomeList.end(), by_out());
 
+		int remaining = ceil(Sp);
 
 	}
 }

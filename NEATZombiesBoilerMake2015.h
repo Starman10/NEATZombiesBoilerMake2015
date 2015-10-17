@@ -145,7 +145,7 @@ public:
 
 class Network
 {
-	vector<Neuron> neuronList{ MaxNodes + BUTTONS };
+	vector<Neuron> neuronList;
 
 	Network() { };
 
