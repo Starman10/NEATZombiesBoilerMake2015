@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Genome.cpp"
+#include "NEATZombiesBoilerMake2015.h"
 #include <vector>
 
 class Species {

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Species.cpp"
+#include "NEATZombiesBoilerMake2015.h"
 #define BUTTONS 13
 
 class Pool {
@@ -12,7 +12,6 @@ public:
 	int currentFrame;
 	int maxFitness;
 	Pool() {
-		std::vector<Species> speciesList;
 		generation = 0;
 		innovation = BUTTONS; //size of ControlNames array 
 		currentSpecies = 1;

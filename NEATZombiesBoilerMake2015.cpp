@@ -8,12 +8,8 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
-#include "Network.cpp"
-#include "Neuron.cpp"
-#include "Gene.cpp"
-#include "Genome.cpp"
-#include "Pool.cpp"
-#include "Species.cpp"
+#include "NEATZombiesBoilerMake2015.h"
+
 
 #define BOXRADIUS 6
 #define BUTTONS 13
@@ -139,26 +135,26 @@ std::vector<double> evaluateNetwork(Network currNet, std::vector<double> currInp
 	}
 	for (int i = 0; i < Inputs; i++)
 	{
-		currNet.NeuronList[i].value = currInputs[i];
+		currNet.neuronList[i].value = currInputs[i];
 	}
 	//http://www.lua.org/pil/7.2.html
 	//don't know how to replicate this:
-	//for _,Neuron in pairs(Network.Neurons) do
-	for (int i = 0; i < currNet.NeuronList.size(); i++) {
+	//for _,Neuron in pairs(Network.Neurons) dob1
+	for (int i = 0; i < currNet.neuronList.size(); i++) {
 		int tempSum = 0;
-		for (int j = 0; j < currNet.NeuronList[i].incoming.size(); j++) {
-			Gene tempIncoming = currNet.NeuronList[i].incoming[j];
-			Neuron other = currNet.NeuronList[tempIncoming.into];
+		for (int j = 0; j < currNet.neuronList[i].incoming.size(); j++) {
+			Gene tempIncoming = currNet.neuronList[i].incoming[j];
+			Neuron other = currNet.neuronList[tempIncoming.into];
 			tempSum = tempSum + tempIncoming.weight * other.value;
 		}
-		if (currNet.NeuronList[i].incoming.size() > 0) {
-			currNet.NeuronList[i].value = sigmoid(tempSum);
+		if (currNet.neuronList[i].incoming.size() > 0) {
+			currNet.neuronList[i].value = sigmoid(tempSum);
 		}
 	}
 	std::vector<double> outputs;
 	for (int o = 1; o < BUTTONS + 1; o++) {
 		string button = "P1 " + ControlNames[o];
-		if (currNet.NeuronList[MaxNodes + o].value > 0)
+		if (currNet.neuronList[MaxNodes + o].value > 0)
 		{
 			outputs[o] = true;
 		} // lines 359-361 imply outputs[string] = true which makes no sense...?
@@ -492,7 +488,8 @@ double totalAverageFitness() {
 
 void cullSpecies(bool cutToOne) {
 	for (int s = 0; s < globalPool.speciesList.size(); s++) {
-		Species currSpecies = globalPool.speciesList[s];
+		Species currSpecies;
+		currSpecies = globalPool.speciesList[s];
 
 		struct by_out {
 			bool operator()(Genome a, Genome b) {
