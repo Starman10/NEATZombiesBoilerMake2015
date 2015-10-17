@@ -37,7 +37,7 @@ using namespace System;
 int inputSize;
 int Inputs;
 //Seth's scanning area of blocks centered on mario
-vector<double> inputs((BOXRADIUS * 2 + 1)*(BOXRADIUS * 2 + 1));
+vector<double> inputs();
 // input of only 
 //zombie coordinates, need to include ALL inputs
 
@@ -142,6 +142,16 @@ public:
 	{ }
 }; //End of Gene Class
 
+class Network
+{
+	vector<Neuron> neuronList{ MaxNodes + BUTTONS };
+
+	Network() { };
+
+	Network(Genome genomeForNetwork)
+	{ }
+
+}; //end of Network Class
 class Genome
 {
 public:
@@ -183,14 +193,5 @@ class Neuron
 		}
 }; //end of Neuron Class
 
-class Network
-{
-	vector<Neuron> neuronList{ MaxNodes + BUTTONS };
 
-	Network() { };
-
-	Network(Genome genomeForNetwork)
-	{ }
-
-}; //end of Network Class
 #endif // NeatZombies header file inclusion if ~~~~~~~~~~~~~~~~~~~~~~~~~
