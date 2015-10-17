@@ -5,10 +5,10 @@
 class Species {
 public:
 
-	int topFitness;
-	int staleness;
+	double topFitness;
+	double staleness;
 	std::vector<Genome> GenomeList;
-	int averageFitness;
+	double averageFitness;
 	Species() {
 		topFitness = 0;
 		staleness = 0;

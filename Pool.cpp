@@ -4,7 +4,7 @@
 
 class Pool {
 public:
-	Species spec;
+	std::vector<Species> speciesList;
 	int generation;
 	int innovation; //size of ControlNames array 
 	int currentSpecies;
