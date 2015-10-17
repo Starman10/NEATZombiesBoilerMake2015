@@ -2,8 +2,12 @@
 #include "Gene.cpp"
 #include "Network.cpp"
 #include <vector>
+#include <string.h>
+
 #define BOXRADIUS 6
 #define BUTTONS 13
+#define INPUTS 170
+
 
 class Genome
 {
@@ -72,7 +76,7 @@ public:
 	{
 		Genome jean = Genome();
 		int innovation = 1;
-		maxNeuron = Inputs;
+		maxNeuron = INPUTS;
 		mutate(jean);    //need to write method!
 	}
 };
