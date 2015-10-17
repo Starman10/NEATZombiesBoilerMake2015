@@ -12,7 +12,7 @@ public:
 	int currentFrame;
 	int maxFitness;
 	Pool() {
-		Species spec;
+		std::vector<Species> speciesList;
 		generation = 0;
 		innovation = BUTTONS; //size of ControlNames array 
 		currentSpecies = 1;
