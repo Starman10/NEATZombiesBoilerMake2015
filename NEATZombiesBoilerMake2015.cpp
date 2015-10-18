@@ -8,6 +8,8 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
+#include <random>
 #include "NEATZombiesBoilerMake2015.h"
 
 
@@ -119,12 +121,6 @@ bool** getInputs() {
 double sigmoid(double x) {
 	return 2 / (1 + exp(-4.9*x)) - 1;
 }
-
-
-
-
-
-
 
 std::vector<double> evaluateNetwork(Network currNet, std::vector<double> currInputs) {
 	currInputs.push_back(1.0);
@@ -460,7 +456,7 @@ void rankGlobally() {
 	std::sort(global.begin(), global.end(), by_out());
 
 	for (int g = 0; g < global.size(); g++) {
-		global[g].
+		global[g].globalRank = g;
 	}
 
 }
@@ -502,8 +498,22 @@ void cullSpecies(bool cutToOne) {
 			remaining = 1;
 		}
 		while (currSpecies.genomeList.size() > remaining) {
-			
+			currSpecies.genomeList.pop_back();
 		}
-
 	}
+}
+
+Genome breedChild(Species currSpecies) {
+	Genome child;
+	if (((double)rand() / (double)RAND_MAX) < CrossoverChance) {
+		Genome g1 = currSpecies.genomeList[((double)rand() / (double)RAND_MAX) * currSpecies.genomeList.size()];
+		Genome g2 = currSpecies.genomeList[((double)rand() / (double)RAND_MAX) * currSpecies.genomeList.size()];
+		child = crossover(g1, g2);
+	}
+	else {
+		Genome g = currSpecies.genomeList[((double)rand() / (double)RAND_MAX) * currSpecies.genomeList.size()];
+		child = copyGenome(g);
+	}
+	mutate(child);
+	return child;
 }

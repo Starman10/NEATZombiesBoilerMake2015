@@ -17,6 +17,8 @@ class Species;
 #include <string>
 #include <iostream>
 #include <vector>
+#include <random>
+#include <cstdlib>
 #include <algorithm>
 /*#include "Network.cpp"
 #include "Neuron.cpp"
