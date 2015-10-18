@@ -512,8 +512,103 @@ Genome breedChild(Species currSpecies) {
 	}
 	else {
 		Genome g = currSpecies.genomeList[((double)rand() / (double)RAND_MAX) * currSpecies.genomeList.size()];
-		child = copyGenome(g);
+		child = Genome(g);
 	}
 	mutate(child);
 	return child;
 }
+
+void removeStaleSpecies() {
+	std::vector<Species> survived;
+	for (int s = 0; s < globalPool.speciesList.size(); s++) {
+		Species currSpecies = globalPool.speciesList[s];
+		struct by_out {
+			bool operator()(Genome a, Genome b) {
+				return a.fitness > b.fitness;
+			}
+		};
+		std::sort(currSpecies.genomeList.begin(), currSpecies.genomeList.end(), by_out());
+
+		if (currSpecies.genomeList[0].fitness > currSpecies.topFitness) {
+			currSpecies.topFitness = currSpecies.genomeList[0].fitness;
+			currSpecies.staleness = 0;
+		}
+		else
+		{
+			currSpecies.staleness = currSpecies.staleness + 1;
+		}
+		if (currSpecies.staleness < StaleSpecies || currSpecies.topFitness >= globalPool.maxFitness) {
+			survived.push_back(currSpecies);
+		}
+	}
+	globalPool.speciesList = survived;
+}
+
+void removeWeakSpecies() {
+	std::vector<Species> survived;
+	
+	double sum = totalAverageFitness();
+	for (int s = 0; s < globalPool.speciesList.size(); s++) {
+		Species currSpecies = globalPool.speciesList[s];
+		int breed = currSpecies.averageFitness / sum * population;
+		if (breed >= 1) {
+			survived.push_back(currSpecies);
+		}
+	}
+	globalPool.speciesList = survived;
+}
+
+void addToSpecies(Genome child) {
+	bool foundSpecies = false;
+	for (int s = 0; s < globalPool.speciesList.size(); s++) {
+		Species currSpecies = globalPool.speciesList[s];
+		if (!foundSpecies && sameSpecies(child, currSpecies.genomeList[0])) {
+			currSpecies.genomeList.push_back(child);
+			foundSpecies = true;
+		}
+	}
+
+	if (!foundSpecies) {
+		Species childSpecies = Species();
+		childSpecies.genomeList.push_back(child);
+		globalPool.speciesList.push_back(childSpecies);
+	}
+}
+
+//777
+void newGeneration() {
+	cullSpecies(false);
+	rankGlobally();
+	removeStaleSpecies();
+	rankGlobally();
+	for (int s = 0; s < globalPool.speciesList.size(); s++) {
+		Species currSpecies = globalPool.speciesList[s];
+		calculateAverageFitness(currSpecies);
+	}
+	removeWeakSpecies();
+	double sum = totalAverageFitness();
+	std::vector<Genome> children;
+	for (int s = 0; s < globalPool.speciesList.size(); s++) {
+		Species currSpecies = globalPool.speciesList[s];
+		int breed = (currSpecies.averageFitness / sum * population) - 1;
+		for (int i = 0; i < breed; i++) {
+			children.push_back(breedChild(currSpecies);
+		}
+	}
+	cullSpecies(true);
+	while ((children.size() + globalPool.speciesList.size()) < population) {
+		Species currSpecies = globalPool.speciesList[rand() % globalPool.speciesList.size()];
+		children.push_back(breedChild(currSpecies));
+	}
+	for (int c = 0; c < children.size(); c++) {
+		Genome child = children[c];
+		addToSpecies(child);
+	}
+	globalPool.generation = globalPool.generation + 1;
+	/*
+	WRITE TO FILE GLOBALPOOL.GENERATION: THEN GIVE 
+	CONTENTS OF THE POOL
+	*/
+
+}
+

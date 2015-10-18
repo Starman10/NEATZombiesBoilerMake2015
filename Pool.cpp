@@ -5,6 +5,7 @@
 	Pool::Pool() 
 	{
 		generation = 0;
+		std::vector<Species> speciesList;
 		innovation = BUTTONS; //size of ControlNames array 
 		currentSpecies = 1;
 		currentGenome = 1;
