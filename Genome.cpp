@@ -49,5 +49,5 @@
 		Genome jean = Genome();
 		int innovation = 1;
 		maxNeuron = Inputs;
-		mutate(jean);    //need to write method!
+		mutate(jean);    
 	}
