@@ -1,0 +1,20 @@
+getkeybinding
+getEntArray
+getNormalHealth
+getAIArray(Axis, allies, netural) (strings)
+get_living_ai_array
+
+
+defaultmdl="char_ger_wrmcht_fullbody1"
+"count" -- max AI to ever spawn from this spawner
+SPAWNER -- makes this a spawner instead of a guy
+FORCESPAWN -- will try to delete an AI if spawning fails from too many AI
+UNDELETABLE -- this AI (or AI spawned from here) cannot be deleted to make room for FORCESPAWN guys
+ENEMYINFO -- this AI when spawned will get a snapshot of perfect info about all enemies
+
+Script_noteworthy: zombie_spawner
+
+model: char_ger_wrmcht_fullbody1
+model: actor_axis_zombie_ger_ber_sshonor
+
+classname, actor_axis_zombie_ger_ber_sshonor
